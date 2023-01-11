@@ -24,12 +24,10 @@ router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
         // get hexToken from cookie
         const hexToken = getCookie('hexToken');
-        console.log(hexToken)
         if (hexToken) {
             try {
                 axios.defaults.headers.common['Authorization'] = hexToken;
                 const {data} = await axios.post('/api/user/check')
-                console.log(data)
                 if (data.success) {
                     next();
                 } else {
