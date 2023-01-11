@@ -35,6 +35,7 @@
       </tr>
       </tbody>
     </table>
+    <pagination :pagination="pagination" @page-change="pageChange"></pagination>
   </div>
 
   <!-- Create/Edit Product Modal -->
@@ -86,7 +87,8 @@
                 </div>
                 <div class="mb-3 form-check form-switch">
                   <label class="form-check-label" for="is-enabled">是否啟用</label>
-                  <input class="form-check-input" type="checkbox" id="is-enabled" role="switch" :true-value="1" :false-value="0"
+                  <input class="form-check-input" type="checkbox" id="is-enabled" role="switch" :true-value="1"
+                         :false-value="0"
                          v-model="selectedProduct.is_enabled">
                 </div>
                 <div class="mb-3">
@@ -151,36 +153,42 @@
 
 <script>
 import {instance as axios} from "./common/axios.js";
+import Pagination from "./components/Pagination.vue";
 
 const apiPath = 'frank-hex-api'
 export default {
   name: "Admin",
+  components: {Pagination},
   data() {
     return {
       products: [],
-
+      pagination: {
+        total_pages: 1,
+        current_page: 1,
+      },
       selectedProduct: {
-        "category": "",
-        "content": "",
-        "description": "",
-        "id": "",
-        "imageUrl": "",
-        "imagesUrl": ["","","","",""],
-        "is_enabled": 0,
-        "origin_price": 0,
-        "price": 0,
-        "title": "",
-        "unit": "單位",
-        "num": 0
+        category: "",
+        content: "",
+        description: "",
+        id: "",
+        imageUrl: "",
+        imagesUrl: ["", "", "", "", ""],
+        is_enabled: 0,
+        origin_price: 0,
+        price: 0,
+        title: "",
+        unit: "單位",
+        num: 0
       },
       isNew: true
     };
   },
   methods: {
-    async getProducts() {
+    async getProducts(page = 1) {
       try {
-        const {data} = await axios.get(`/api/${apiPath}/admin/products`)
+        const {data} = await axios.get(`/api/${apiPath}/admin/products?page=${page}`);
         this.products = data.products
+        this.pagination = data.pagination
       } catch (e) {
         console.log(e)
       }
@@ -227,7 +235,7 @@ export default {
         "description": "",
         "id": "",
         "imageUrl": "",
-        "imagesUrl": ["","","","",""],
+        "imagesUrl": ["", "", "", "", ""],
         "is_enabled": 0,
         "origin_price": 0,
         "price": 0,
@@ -235,10 +243,15 @@ export default {
         "unit": "單位",
         "num": 0
       }
+    },
+    async pageChange(page) {
+      if(page !== this.pagination.current_page || page >= 0 || page <= this.pagination.total_pages){
+        await this.getProducts(page)
+      }
     }
   },
-  mounted() {
-    this.getProducts();
+  async mounted() {
+    await this.getProducts();
   },
 }
 </script>
