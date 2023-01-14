@@ -54,5 +54,8 @@ export const productStore = defineStore('product', {
                 "num": 0
             }
         },
+        setIsNew(isNew) {
+            this.isNew = isNew
+        }
     },
 })
