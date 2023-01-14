@@ -29,7 +29,7 @@
                   data-bs-target="#updateProductModal" @click="selectedProduct = {...product}; isNew = false">編輯
           </button>
           <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal"
-                  @click="selectedProduct = product">刪除
+                  @click="selectProduct(product)">刪除
           </button>
         </td>
       </tr>
@@ -128,77 +128,30 @@
   </div>
 
   <!-- Delete Product Modal -->
-  <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel"
-       aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="deleteProductModalLabel">確定刪除？</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          確定要刪除 <span class="fw-bold fst-italic">{{ selectedProduct.title }}</span> 嗎？ <br>
-          刪除後將無法復原。
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                  @click="deleteProduct(selectedProduct.id)">刪除
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <delete-product-modal></delete-product-modal>
 </template>
 
 <script>
-import {instance as axios} from "./common/axios.js";
+import {mapActions, mapState} from "pinia";
+import {productStore} from "./stores/product.js";
 import Pagination from "./components/Pagination.vue";
+import DeleteProductModal from "./components/DeleteProductModal.vue";
 
 const apiPath = 'frank-hex-api'
 export default {
   name: "Admin",
-  components: {Pagination},
+  components: {Pagination, DeleteProductModal},
   data() {
-    return {
-      products: [],
-      pagination: {
-        total_pages: 1,
-        current_page: 1,
-      },
-      selectedProduct: {
-        category: "",
-        content: "",
-        description: "",
-        id: "",
-        imageUrl: "",
-        imagesUrl: ["", "", "", "", ""],
-        is_enabled: 0,
-        origin_price: 0,
-        price: 0,
-        title: "",
-        unit: "單位",
-        num: 0
-      },
-      isNew: true
-    };
+    return {};
   },
   methods: {
-    async getProducts(page = 1) {
-      try {
-        const {data} = await axios.get(`/api/${apiPath}/admin/products?page=${page}`);
-        this.products = data.products
-        this.pagination = data.pagination
-      } catch (e) {
-        console.log(e)
-      }
-    },
+    ...mapActions(productStore, ['clearProduct','getProducts','selectProduct']),
     async updateProduct(isNew) {
       this.selectedProduct.origin_price = Number(this.selectedProduct.origin_price)
       this.selectedProduct.price = Number(this.selectedProduct.price)
       if (isNew) {
         try {
-          const {data} = await axios.post(`/api/${apiPath}/admin/product`, {data: this.selectedProduct})
+          const {data} = await this.axios.post(`/api/${apiPath}/admin/product`, {data: this.selectedProduct})
           if (data.success) {
             await this.getProducts()
           }
@@ -218,16 +171,6 @@ export default {
         }
       }
     },
-    async deleteProduct(id) {
-      try {
-        const {data} = await axios.delete(`/api/${apiPath}/admin/product/${id}`)
-        if (data.success) {
-          await this.getProducts()
-        }
-      } catch (e) {
-        console.log(e)
-      }
-    },
     clearProduct() {
       this.selectedProduct = {
         "category": "",
@@ -245,10 +188,13 @@ export default {
       }
     },
     async pageChange(page) {
-      if(page !== this.pagination.current_page || page >= 0 || page <= this.pagination.total_pages){
-        await this.getProducts(page)
+      if (page !== this.pagination.current_page || page >= 0 || page <= this.pagination.total_pages) {
+        await productStore().getProducts(page)
       }
     }
+  },
+  computed:{
+    ...mapState(productStore, ['products', 'pagination', 'selectedProduct', 'isNew'])
   },
   async mounted() {
     await this.getProducts();
