@@ -52,12 +52,19 @@
                          :false-value="0"
                          v-model="selectedProduct.is_enabled">
                 </div>
-                <div class="mb-3">
+                <div class="row mb-3">
                   <label for="image-url" class="form-label">產品主圖</label>
-                  <input type="text" class="form-control" id="image-url" placeholder="請輸入主圖網址"
-                         v-model="selectedProduct.imageUrl">
+                  <div class="col">
+                    <input type="text" class="form-control" id="image-url" placeholder="請輸入主圖網址"
+                           v-model="selectedProduct.imageUrl">
+                  </div>
+                  <div class="col input-group">
+                    <input type="file" class="form-control" @change="uploadProductImage" ref="image-file">
+                    <button type="button" class="btn btn-outline-danger" @click="clearImageFile">X</button>
+                  </div>
                   <div class="text-center">
-                    <img class="img-fluid w-50 mt-3" :src="selectedProduct.imageUrl" alt="產品主圖">
+                    <img class="img-fluid w-50 mt-3" :src="selectedProduct.imageUrl" alt="產品主圖"
+                         v-if="selectedProduct.imageUrl.length > 0">
                   </div>
                 </div>
               </form>
@@ -95,7 +102,7 @@ import {productStore} from "../stores/product.js";
 
 export default {
   name: "UpdateProductModal",
-  methods:{
+  methods: {
     async updateProduct(isNew) {
       this.selectedProduct.origin_price = Number(this.selectedProduct.origin_price)
       this.selectedProduct.price = Number(this.selectedProduct.price)
@@ -121,8 +128,28 @@ export default {
         }
       }
     },
+    async uploadProductImage(event) {
+      if (event.target.files.length === 0) return
+      const file = event.target.files[0]
+      const formData = new FormData()
+      formData.append('file-to-upload', file)
+      try {
+        const {data} = await this.$axios.post(`/api/${import.meta.env.VITE_API_PATH}/admin/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        this.selectedProduct.imageUrl = data.imageUrl
+        alert('圖片上傳成功')
+      }catch(e){
+        alert('圖片上傳失敗，請重新上傳')
+      }
+    },
+    clearImageFile() {
+      this.$refs['image-file'].value = ''
+    }
   },
-  computed:{
+  computed: {
     ...mapState(productStore, ['selectedProduct', 'isNew'])
   }
 }
