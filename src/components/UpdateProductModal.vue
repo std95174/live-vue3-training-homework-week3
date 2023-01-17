@@ -46,12 +46,28 @@
                     <input type="text" class="form-control" id="price" v-model="selectedProduct.price">
                   </div>
                 </div>
-                <div class="mb-3 form-check form-switch">
-                  <label class="form-check-label" for="is-enabled">是否啟用</label>
-                  <input class="form-check-input" type="checkbox" id="is-enabled" role="switch" :true-value="1"
-                         :false-value="0"
-                         v-model="selectedProduct.is_enabled">
+                <div class="row mb-3">
+                  <div class="col">
+                    <label class="form-label">商品評價</label>
+                    <div>
+                      <a href="#" class="text-decoration-none text-warning" @click.prevent="selectedProduct.rating = n"
+                         v-for="n in 5"><span
+                          class="material-symbols-outlined">{{
+                          n <= selectedProduct.rating ? 'stars' : 'star'
+                        }}</span></a>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-check form-switch">
+
+                      <label class="form-check-label" for="is-enabled">是否啟用</label>
+                      <input class="form-check-input" type="checkbox" id="is-enabled" role="switch" :true-value="1"
+                             :false-value="0"
+                             v-model="selectedProduct.is_enabled">
+                    </div>
+                  </div>
                 </div>
+
                 <div class="row mb-3">
                   <label for="image-url" class="form-label">產品主圖</label>
                   <div class="col">
@@ -60,7 +76,9 @@
                   </div>
                   <div class="col input-group">
                     <input type="file" class="form-control" @change="uploadMainImage" ref="image-file">
-                    <button type="button" class="btn btn-outline-danger" @click="clearMainImageFile">X</button>
+                    <button type="button" class="btn btn-outline-danger" @click="clearMainImageFile">
+                      <span class="material-symbols-outlined">close</span>
+                    </button>
                   </div>
                   <div class="text-center">
                     <img class="img-fluid w-50 mt-3" :src="selectedProduct.imageUrl" alt="產品主圖"
@@ -84,7 +102,9 @@
                       <input type="text" class="form-control" :id="`image-url-${n + 1}`"
                              :placeholder="`請輸入圖片網址 ${n + 1}`"
                              v-model="selectedProduct.imagesUrl[n]">
-                      <button type="button" class="btn btn-outline-danger" @click="removeImagesUrl(n)">X</button>
+                      <button type="button" class="btn btn-outline-danger" @click="removeImagesUrl(n)">
+                        <span class="material-symbols-outlined">close</span>
+                      </button>
                     </div>
                     <div class="text-start">
                       <img class="img-fluid w-100 mt-3" :src="selectedProduct.imagesUrl[n]" :alt="`產品圖片 ${n}`"
@@ -203,5 +223,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
