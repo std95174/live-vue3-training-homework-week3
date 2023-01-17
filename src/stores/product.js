@@ -16,7 +16,8 @@ export const productStore = defineStore('product', {
             price: 0,
             title: "",
             unit: "單位",
-            num: 0
+            num: 0,
+            rating: 0
         },
         pagination: {
             total_pages: 1,
@@ -40,18 +41,19 @@ export const productStore = defineStore('product', {
         },
         clearProduct() {
             this.selectedProduct = {
-                "category": "",
-                "content": "",
-                "description": "",
-                "id": "",
-                "imageUrl": "",
-                "imagesUrl": [],
-                "is_enabled": 0,
-                "origin_price": 0,
-                "price": 0,
-                "title": "",
-                "unit": "單位",
-                "num": 0
+                category: "",
+                content: "",
+                description: "",
+                id: "",
+                imageUrl: "",
+                imagesUrl: [],
+                is_enabled: 0,
+                origin_price: 0,
+                price: 0,
+                title: "",
+                unit: "單位",
+                num: 0,
+                rating: 0
             }
         },
         setIsNew(isNew) {
