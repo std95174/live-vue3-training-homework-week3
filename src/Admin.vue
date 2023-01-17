@@ -35,7 +35,7 @@
       </tr>
       </tbody>
     </table>
-    <pagination :pagination="pagination" @page-change="pageChange"></pagination>
+    <pagination ></pagination>
   </div>
 
   <!--  Update Product Modal -->
@@ -61,11 +61,6 @@ export default {
   },
   methods: {
     ...mapActions(productStore, ['clearProduct', 'getProducts', 'selectProduct', 'setIsNew']),
-    async pageChange(page) {
-      if (page !== this.pagination.current_page || page >= 0 || page <= this.pagination.total_pages) {
-        await productStore().getProducts(page)
-      }
-    }
   },
   computed: {
     ...mapState(productStore, ['products', 'pagination', 'selectedProduct', 'isNew'])
