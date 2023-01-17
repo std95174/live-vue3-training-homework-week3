@@ -59,8 +59,8 @@
                            v-model="selectedProduct.imageUrl">
                   </div>
                   <div class="col input-group">
-                    <input type="file" class="form-control" @change="uploadProductImage" ref="image-file">
-                    <button type="button" class="btn btn-outline-danger" @click="clearImageFile">X</button>
+                    <input type="file" class="form-control" @change="uploadMainImage" ref="image-file">
+                    <button type="button" class="btn btn-outline-danger" @click="clearMainImageFile">X</button>
                   </div>
                   <div class="text-center">
                     <img class="img-fluid w-50 mt-3" :src="selectedProduct.imageUrl" alt="產品主圖"
@@ -70,14 +70,25 @@
               </form>
             </div>
             <div class="col">
+              <div class="text-end mb-3">
+                <button type="button" class="btn btn-outline-primary me-3" @click="addImage">新增圖片</button>
+                <button type="button" class="btn btn-outline-success" @click="uploadImageFile">上傳圖片</button>
+              </div>
+              <hr>
               <form>
                 <div class="row mb-3">
-                  <div class="col-6" v-for="(i, n) in 5" :key="n">
-                    <label :for="`image-url-${n}`" class="form-label">圖片網址 {{ i }}</label>
-                    <input type="text" class="form-control" :id="`image-url-${n}`" :placeholder="`請輸入圖片網址 ${i}`"
-                           v-model="selectedProduct.imagesUrl[n]">
+                  <div class="col-6" v-for="(url, n) in selectedProduct.imagesUrl" :key="url.id">
+                    <label :for="`image-url-${n + 1}`" class="form-label">圖片網址 {{ n + 1 }}</label>
+                    <div class="input-group">
+
+                      <input type="text" class="form-control" :id="`image-url-${n + 1}`"
+                             :placeholder="`請輸入圖片網址 ${n + 1}`"
+                             v-model="selectedProduct.imagesUrl[n]">
+                      <button type="button" class="btn btn-outline-danger" @click="removeImagesUrl(n)">X</button>
+                    </div>
                     <div class="text-start">
-                      <img class="img-fluid w-100 mt-3" :src="selectedProduct.imagesUrl[n]" :alt="`產品圖片 ${i}`">
+                      <img class="img-fluid w-100 mt-3" :src="selectedProduct.imagesUrl[n]" :alt="`產品圖片 ${n}`"
+                           v-if="selectedProduct.imagesUrl[n].length">
                     </div>
                   </div>
                 </div>
@@ -128,7 +139,7 @@ export default {
         }
       }
     },
-    async uploadProductImage(event) {
+    async uploadMainImage(event) {
       if (event.target.files.length === 0) return
       const file = event.target.files[0]
       const formData = new FormData()
@@ -141,13 +152,49 @@ export default {
         })
         this.selectedProduct.imageUrl = data.imageUrl
         alert('圖片上傳成功')
-      }catch(e){
+      } catch (e) {
         alert('圖片上傳失敗，請重新上傳')
       }
     },
-    clearImageFile() {
+    clearMainImageFile() {
       this.$refs['image-file'].value = ''
-    }
+    },
+    addImage() {
+      const imagesUrl = this.selectedProduct.imagesUrl
+      if (imagesUrl[imagesUrl.length - 1] === '') return
+      imagesUrl.push('')
+    },
+    removeImagesUrl(index) {
+      this.selectedProduct.imagesUrl.splice(index, 1)
+    },
+    async uploadImageFile() {
+      // javascript file input
+      const input = document.createElement('input')
+      input.type = 'file'
+
+      input.addEventListener('change', async (event) => {
+        const file = event.target.files[0]
+        const formData = new FormData()
+        formData.append('file-to-upload', file)
+        try {
+          const {data} = await this.$axios.post(`/api/${import.meta.env.VITE_API_PATH}/admin/upload`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          const imagesUrl = this.selectedProduct.imagesUrl
+          if (imagesUrl[imagesUrl.length - 1] === '') {
+            imagesUrl[imagesUrl.length - 1] = data.imageUrl
+          } else {
+            imagesUrl.push(data.imageUrl)
+          }
+          alert('圖片上傳成功')
+        } catch (e) {
+          alert('圖片上傳失敗，請重新上傳')
+        }
+      })
+      input.click()
+    },
   },
   computed: {
     ...mapState(productStore, ['selectedProduct', 'isNew'])
