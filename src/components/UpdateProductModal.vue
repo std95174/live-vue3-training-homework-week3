@@ -76,9 +76,7 @@
                   </div>
                   <div class="col input-group">
                     <input type="file" class="form-control" @change="uploadMainImage" ref="image-file">
-                    <button type="button" class="btn btn-outline-danger" @click="clearMainImageFile">
-                      <span class="material-symbols-outlined">close</span>
-                    </button>
+                    <button type="button" class="btn btn-outline-danger" @click="clearMainImageFile">X</button>
                   </div>
                   <div class="text-center">
                     <img class="img-fluid w-50 mt-3" :src="selectedProduct.imageUrl" alt="產品主圖"
@@ -102,9 +100,7 @@
                       <input type="text" class="form-control" :id="`image-url-${n + 1}`"
                              :placeholder="`請輸入圖片網址 ${n + 1}`"
                              v-model="selectedProduct.imagesUrl[n]">
-                      <button type="button" class="btn btn-outline-danger" @click="removeImagesUrl(n)">
-                        <span class="material-symbols-outlined">close</span>
-                      </button>
+                      <button type="button" class="btn btn-outline-danger" @click="removeImagesUrl(n)">X</button>
                     </div>
                     <div class="text-start">
                       <img class="img-fluid w-100 mt-3" :src="selectedProduct.imagesUrl[n]" :alt="`產品圖片 ${n}`"
@@ -143,8 +139,9 @@ export default {
           if (data.success) {
             await productStore().getProducts()
           }
+          alert('產品新增成功')
         } catch (e) {
-          console.log(e)
+          alert('產品新增失敗')
         }
       } else {
         try {
@@ -154,8 +151,9 @@ export default {
           if (data.success) {
             await productStore().getProducts()
           }
+          alert('產品更新成功')
         } catch (e) {
-          console.log(e)
+          alert('產品更新失敗')
         }
       }
     },
