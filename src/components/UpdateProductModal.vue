@@ -126,11 +126,13 @@
 <script>
 import {mapState} from "pinia";
 import {productStore} from "../stores/product.js";
+import {loadingStore} from "../stores/loading.js";
 
 export default {
   name: "UpdateProductModal",
   methods: {
     async updateProduct(isNew) {
+      loadingStore().setIsLoading(true)
       this.selectedProduct.origin_price = Number(this.selectedProduct.origin_price)
       this.selectedProduct.price = Number(this.selectedProduct.price)
       if (isNew) {
@@ -142,6 +144,8 @@ export default {
           alert('產品新增成功')
         } catch (e) {
           alert('產品新增失敗')
+        } finally {
+          loadingStore().setIsLoading(false)
         }
       } else {
         try {
@@ -154,11 +158,15 @@ export default {
           alert('產品更新成功')
         } catch (e) {
           alert('產品更新失敗')
+        } finally {
+          loadingStore().setIsLoading(false)
         }
       }
     },
     async uploadMainImage(event) {
       if (event.target.files.length === 0) return
+      loadingStore().setIsLoading(true)
+
       const file = event.target.files[0]
       const formData = new FormData()
       formData.append('file-to-upload', file)
@@ -172,6 +180,8 @@ export default {
         alert('圖片上傳成功')
       } catch (e) {
         alert('圖片上傳失敗，請重新上傳')
+      } finally {
+        loadingStore().setIsLoading(false)
       }
     },
     clearMainImageFile() {
@@ -191,6 +201,8 @@ export default {
       input.type = 'file'
 
       input.addEventListener('change', async (event) => {
+        loadingStore().setIsLoading(true)
+
         const file = event.target.files[0]
         const formData = new FormData()
         formData.append('file-to-upload', file)
@@ -209,6 +221,8 @@ export default {
           alert('圖片上傳成功')
         } catch (e) {
           alert('圖片上傳失敗，請重新上傳')
+        } finally {
+          loadingStore().setIsLoading(false)
         }
       })
       input.click()

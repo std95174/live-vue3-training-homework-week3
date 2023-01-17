@@ -24,13 +24,15 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'pinia'
+import {mapState, mapActions} from 'pinia'
 import {productStore} from "../stores/product.js";
+import {loadingStore} from "../stores/loading.js";
 
 export default {
   name: "DeleteProductModal",
-  methods:{
+  methods: {
     async deleteProduct(id) {
+      loadingStore().setIsLoading(true)
       try {
         const {data} = await this.$axios.delete(`/api/${import.meta.env.VITE_API_PATH}/admin/product/${id}`)
         if (data.success) {
@@ -38,10 +40,12 @@ export default {
         }
       } catch (e) {
         console.log(e)
+      } finally {
+        loadingStore().setIsLoading(false)
       }
     },
   },
-  computed:{
+  computed: {
     ...mapState(productStore, ['selectedProduct']),
   }
 }

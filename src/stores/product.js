@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {instance as axios} from "../common/axios.js";
+import {loadingStore} from "./loading.js";
 
 export const productStore = defineStore('product', {
     state: () => ({
@@ -28,12 +29,15 @@ export const productStore = defineStore('product', {
     getters: {},
     actions: {
         async getProducts(page = 1) {
+            loadingStore().setIsLoading(true)
             try {
                 const {data} = await axios.get(`/api/${import.meta.env.VITE_API_PATH}/admin/products?page=${page}`);
                 this.products = data.products
                 this.pagination = data.pagination
             } catch (e) {
                 alert(e.response.data.message)
+            } finally {
+                loadingStore().setIsLoading(false)
             }
         },
         selectProduct(product) {
