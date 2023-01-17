@@ -39,11 +39,11 @@
                 <div class="row mb-3">
                   <div class="col">
                     <label for="origin-price" class="form-label">原價</label>
-                    <input type="text" class="form-control" id="origin-price" v-model="selectedProduct.origin_price">
+                    <input type="number" class="form-control" id="origin-price" v-model.number="selectedProduct.origin_price">
                   </div>
                   <div class="col">
                     <label for="price" class="form-label">售價</label>
-                    <input type="text" class="form-control" id="price" v-model="selectedProduct.price">
+                    <input type="number" class="form-control" id="price" v-model.number="selectedProduct.price">
                   </div>
                 </div>
                 <div class="row mb-3">
